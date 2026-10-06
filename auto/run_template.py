@@ -5,7 +5,7 @@ from pid_template import update
 from pid_template import calculate_desired_acceleration
 from pid_template import acceleration_to_throttle_percentage
 
-K_P = 0.1
+K_P = 7
 K_I = 0.1
 K_D = 0.1
  
@@ -14,6 +14,7 @@ car = make_car(desired_v=20.0, dt=0.1)
 
 recorded_error = []
 recorded_velocity  = []
+x_axis = np.linspace(1, STEPS, num=STEPS, dtype=int)
 
 # Add the human-readable parts of the plot
 plt.figure(figsize=(7, 5))
@@ -22,14 +23,15 @@ plt.xlabel("Steps")
 plt.ion()
 plt.show()
 
+plt.plot(np.linspace(1, STEPS, num=STEPS, dtype=int), [20]*STEPS, color='black', linewidth=2, label='Target Velocity (m/s)'       )
 plt.plot([0], [0], color='blue', linewidth=2, label='Velocity Over Time (m/s)'       )
-plt.plot([0], [0], recorded_error   , color='red' , linewidth=2, label='Velocity Error Over Time (m/s)' )
+plt.plot([0], [0], color='red' , linewidth=2, label='Velocity Error Over Time (m/s)' )
 plt.legend()
 
 for step in range(STEPS):
   
   #run p controler to get error and theoreticaly desired acceleration
-  (acceleration, error) = calculate_desired_acceleration(car, 0.9)
+  (acceleration, error) = calculate_desired_acceleration(car, K_P)
     
   #convert the theoretically desired acceleration to a feasable
   #  percentage of the maximum power of the motor 
@@ -44,9 +46,11 @@ for step in range(STEPS):
   recorded_velocity.append(car["v"])
 
   #graph: <desired_value>, <error>
-  plt.plot(np.linspace(1, step, num=step, dtype=int), recorded_velocity, color='blue', linewidth=2, label='Velocity Over Time (m/s)'       )
-  plt.plot(np.linspace(1, step, num=step, dtype=int), recorded_error   , color='red' , linewidth=2, label='Velocity Error Over Time (m/s)' )
-  plt.pause(0.05)
+  plt.plot(x_axis[:step], recorded_velocity, color='blue', linewidth=2, label='Velocity Over Time (m/s)'       )
+  plt.plot(x_axis[:step], recorded_error   , color='red' , linewidth=2, label='Velocity Error Over Time (m/s)' )
+  
+  #pause graph until next update
+  plt.pause(0.01)
 
 plt.show()
 input("")
