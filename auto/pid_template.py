@@ -56,4 +56,9 @@ def acceleration_to_throttle_percentage(acceleration_desired: float, mass: float
         #input: desired_acceleration(float)
         #output: throttle percentage (float, -1 to 1)
         
-        #
+        #use F=ma ==> F/m = a to calculate ceiling force
+        MAX_ACCELERAITION = max_throttle_force / mass
+
+        #return the acceleration as a percentage of maximum throttle.
+        #As motor cannot spin faseter than 100% of it's rpm, we clip to keep magnitude <= 1
+        return np.clip(acceleration_desired / MAX_ACCELERAITION, -1, 1);
