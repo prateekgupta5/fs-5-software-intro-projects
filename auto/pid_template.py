@@ -15,7 +15,7 @@ def make_car(desired_v:float=20.0, dt:float=0.1) -> dict:
         "step" : 0,
     
         #hint: use these variables in the integral and derivative portion of your PID control (steps 5 and 6 )
-        "error_prev" : None,
+        "error_prev" : 0.0,
         "net_integral" : 0.0
     }
     return car_state_dictionary
@@ -54,11 +54,14 @@ def calculate_desired_acceleration(car: dict, K_P: float, K_I: float = 0.0, K_D:
         integral_component = K_I * car["net_integral"] #scale updated sum
 
         #calculate dirivatave component
-        de: float = (error - (car["error_prev"])) / (car["dt"])
+        de = (error - car["error_prev"]) / car["dt"]
         dirivatave_component = de * K_D
 
         #sum components to get pi output
         acceleration = proportional_component + integral_component + dirivatave_component
+
+        #reset prev error
+        car["error_prev"] = error
 
         return (acceleration, error)
 

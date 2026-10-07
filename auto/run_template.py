@@ -5,11 +5,13 @@ from pid_template import update
 from pid_template import calculate_desired_acceleration
 from pid_template import acceleration_to_throttle_percentage
 
-K_P = 5
-K_I = 0.03
-K_D = 0.1
+K_P = 0.22
+K_I = 0.01
+K_D = 0.01
  
-STEPS = 550 
+STEPS = 550
+GRAPH_BATCH_SIZE = 20
+
 car = make_car(desired_v=20.0, dt=0.1)
 
 recorded_error = []
@@ -23,7 +25,8 @@ plt.xlabel("Steps")
 plt.ion()
 plt.show()
 
-plt.plot(np.linspace(1, STEPS, num=STEPS, dtype=int), [20]*STEPS, color='black', linewidth=2, label='Target Velocity (m/s)'       )
+#initialise the lines and then update the legend
+plt.plot(np.linspace(1, STEPS, num=STEPS, dtype=int), [car["desired_v"]]*STEPS, color='black', linewidth=1, label='Target Velocity (m/s)'       )
 plt.plot([0], [0], color='blue', linewidth=2, label='Velocity Over Time (m/s)'       )
 plt.plot([0], [0], color='red' , linewidth=2, label='Velocity Error Over Time (m/s)' )
 plt.legend()
@@ -45,12 +48,11 @@ for step in range(STEPS):
   recorded_error.append(error)
   recorded_velocity.append(car["v"])
 
-  #graph: <desired_value>, <error>
-  plt.plot(x_axis[:step], recorded_velocity, color='blue', linewidth=2, label='Velocity Over Time (m/s)'       )
-  plt.plot(x_axis[:step], recorded_error   , color='red' , linewidth=2, label='Velocity Error Over Time (m/s)' )
-  print(error)
-  #pause graph until next update
-  plt.pause(0.01)
-
-plt.show()
-input("")
+  #ever GRAPH_BATCH_SIZE steps, graph: <desired_value>, <error>
+  if step % GRAPH_BATCH_SIZE == 0:
+    plt.plot(x_axis[:step], recorded_velocity, color='blue', linewidth=2, label='Velocity Over Time (m/s)'       )
+    plt.plot(x_axis[:step], recorded_error   , color='red' , linewidth=2, label='Velocity Error Over Time (m/s)' )
+    print(error)
+    #pause graph until next update
+    plt.pause(0.01)
+input()
