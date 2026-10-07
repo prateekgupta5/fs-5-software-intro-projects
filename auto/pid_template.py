@@ -45,12 +45,18 @@ def calculate_desired_acceleration(car: dict, K_P: float, K_I: float = 0.0, K_D:
         #output: desired acceleration and error tuple(float, float)
         
         error = car["desired_v"] - car["v"]
-        acceleration = K_P * error
+        
+        #calculate proportional part
+        proportional_component = K_P * error
+
+        #calculate integral part
+        car["net_integral"] += car["dt"] * error
+        integral_component = K_I * car["net_integral"]
+
+        #sum components to get pi output
+        acceleration = proportional_component + integral_component
 
         return (acceleration, error)
-
-
-
 
 def acceleration_to_throttle_percentage(acceleration_desired: float, mass: float = 1000, max_throttle_force: float = 5000) -> float:
         #input: desired_acceleration(float)

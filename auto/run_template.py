@@ -5,8 +5,8 @@ from pid_template import update
 from pid_template import calculate_desired_acceleration
 from pid_template import acceleration_to_throttle_percentage
 
-K_P = 7
-K_I = 0.1
+K_P = 5
+K_I = 0.03
 K_D = 0.1
  
 STEPS = 550 
@@ -18,7 +18,7 @@ x_axis = np.linspace(1, STEPS, num=STEPS, dtype=int)
 
 # Add the human-readable parts of the plot
 plt.figure(figsize=(7, 5))
-plt.title("P Controller Output Over Time")
+plt.title("PI Controller Output Over Time")
 plt.xlabel("Steps")
 plt.ion()
 plt.show()
@@ -31,7 +31,7 @@ plt.legend()
 for step in range(STEPS):
   
   #run p controler to get error and theoreticaly desired acceleration
-  (acceleration, error) = calculate_desired_acceleration(car, K_P)
+  (acceleration, error) = calculate_desired_acceleration(car, K_P, K_I, K_D)
     
   #convert the theoretically desired acceleration to a feasable
   #  percentage of the maximum power of the motor 
@@ -48,7 +48,7 @@ for step in range(STEPS):
   #graph: <desired_value>, <error>
   plt.plot(x_axis[:step], recorded_velocity, color='blue', linewidth=2, label='Velocity Over Time (m/s)'       )
   plt.plot(x_axis[:step], recorded_error   , color='red' , linewidth=2, label='Velocity Error Over Time (m/s)' )
-  
+  print(error)
   #pause graph until next update
   plt.pause(0.01)
 
