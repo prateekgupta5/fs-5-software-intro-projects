@@ -46,15 +46,19 @@ def calculate_desired_acceleration(car: dict, K_P: float, K_I: float = 0.0, K_D:
         
         error = car["desired_v"] - car["v"]
         
-        #calculate proportional part
+        #calculate proportional component
         proportional_component = K_P * error
 
-        #calculate integral part
-        car["net_integral"] += car["dt"] * error
-        integral_component = K_I * car["net_integral"]
+        #calculate integral component
+        car["net_integral"] += car["dt"] * error       #update sum
+        integral_component = K_I * car["net_integral"] #scale updated sum
+
+        #calculate dirivatave component
+        de: float = (error - (car["error_prev"])) / (car["dt"])
+        dirivatave_component = de * K_D
 
         #sum components to get pi output
-        acceleration = proportional_component + integral_component
+        acceleration = proportional_component + integral_component + dirivatave_component
 
         return (acceleration, error)
 
